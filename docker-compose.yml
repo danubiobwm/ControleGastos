@@ -1,31 +1,24 @@
 services:
   db:
     image: postgres:15
-    container_name: controle_gastos_db
     environment:
       POSTGRES_DB: gastosdb
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
 
   backend:
-    build:
-      context: ./backend/ControleGastos.Api
-      dockerfile: Dockerfile
-    container_name: controle_gastos_api
+    build: ./backend/ControleGastos.Api
     ports:
       - "5000:8080"
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Database=gastosdb;Username=admin;Password=password123
+      - ConnectionStrings__DefaultConnection=Host=db;Database=gastosdb;Username=user;Password=password
     depends_on:
       - db
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: controle_gastos_web
+    build: ./frontend
     ports:
       - "3000:3000"
     depends_on:
