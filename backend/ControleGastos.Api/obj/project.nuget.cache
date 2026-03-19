@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "w1LNsbv10R0=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\progd\\Dev\\ControleGastos\\backend\\ControleGastos.Api\\ControleGastos.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\progd\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.14\\microsoft.aspnetcore.openapi.9.0.14.nupkg.sha512",
+    "C:\\Users\\progd\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
