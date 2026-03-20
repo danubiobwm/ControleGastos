@@ -10,13 +10,13 @@ public class Pessoa
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
-    [Required, MaxLength(200)]
+    [Required]
+    [MaxLength(200)]
     public string Nome { get; set; } = string.Empty;
 
     [Required]
     public int Idade { get; set; }
 
-    [JsonIgnore]
     public ICollection<Transacao> Transacoes { get; set; } = new List<Transacao>();
 }
 
@@ -26,7 +26,8 @@ public class Categoria
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
-    [Required, MaxLength(400)]
+    [Required]
+    [MaxLength(400)]
     public string Descricao { get; set; } = string.Empty;
 
     [Required]
@@ -48,10 +49,13 @@ public class Transacao
     [Required]
     public string Tipo { get; set; } = "Despesa";
 
+    [Required]
     public Guid CategoriaId { get; set; }
     public Categoria? Categoria { get; set; }
 
+    [Required]
     public Guid PessoaId { get; set; }
+
     [JsonIgnore]
     public Pessoa? Pessoa { get; set; }
 }
