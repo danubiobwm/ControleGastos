@@ -1,0 +1,149 @@
+@baseUrl = http://localhost:5000/api
+
+### --- CADASTRO DE PESSOAS ---
+
+# 1. Criar Pessoa (Maior de Idade)
+# @name criarPessoaMaior
+POST {{baseUrl}}/pessoas
+Content-Type: application/json
+
+{
+  "nome": "João Silva",
+  "idade": 30
+}
+
+###
+
+# 2. Criar Pessoa (Menor de Idade - Para testar regra de transação)
+POST {{baseUrl}}/pessoas
+Content-Type: application/json
+
+{
+  "nome": "Pedro Filho",
+  "idade": 15
+}
+
+###
+
+# 3. Listar Todas as Pessoas
+GET {{baseUrl}}/pessoas
+Accept: application/json
+
+###
+
+# 4. Editar Pessoa (Funcionalidade solicitada)
+# Substitua o ID pelo retornado no passo 1
+PUT {{baseUrl}}/pessoas/{ID_GERADO}
+Content-Type: application/json
+
+{
+  "nome": "João Silva Alterado",
+  "idade": 31
+}
+
+###
+
+# 5. Deletar Pessoa (Apaga também as transações dela)
+DELETE {{baseUrl}}/pessoas/{ID_GERADO}
+
+
+### --- CADASTRO DE CATEGORIAS ---
+
+# 6. Criar Categoria de Receita
+POST {{baseUrl}}/categorias
+Content-Type: application/json
+
+{
+  "descricao": "Salário Mensal",
+  "finalidade": "receita"
+}
+
+###
+
+# 7. Criar Categoria de Despesa
+POST {{baseUrl}}/categorias
+Content-Type: application/json
+
+{
+  "descricao": "Aluguel",
+  "finalidade": "despesa"
+}
+
+###
+
+# 8. Criar Categoria de Ambas
+POST {{baseUrl}}/categorias
+Content-Type: application/json
+
+{
+  "descricao": "Diversos",
+  "finalidade": "ambas"
+}
+
+###
+
+# 9. Listar Categorias
+GET {{baseUrl}}/categorias
+Accept: application/json
+
+
+### --- CADASTRO DE TRANSAÇÕES (COM REGRAS) ---
+
+# 10. Criar Transação Válida (Receita para maior de idade)
+POST {{baseUrl}}/transacoes
+Content-Type: application/json
+
+{
+  "descricao": "Pagamento de Consultoria",
+  "valor": 1500.00,
+  "tipo": "receita",
+  "categoriaId": "{ID_CATEGORIA_RECEITA}",
+  "pessoaId": "{ID_PESSOA_MAIOR}"
+}
+
+###
+
+# 11. TESTE DE ERRO: Receita para Menor de Idade (Deve retornar 400)
+POST {{baseUrl}}/transacoes
+Content-Type: application/json
+
+{
+  "descricao": "Mesada",
+  "valor": 50.00,
+  "tipo": "receita",
+  "categoriaId": "{ID_CATEGORIA_RECEITA}",
+  "pessoaId": "{ID_PESSOA_MENOR}"
+}
+
+###
+
+# 12. TESTE DE ERRO: Tipo Despesa em Categoria de Receita (Deve retornar 400)
+POST {{baseUrl}}/transacoes
+Content-Type: application/json
+
+{
+  "descricao": "Estorno Indevido",
+  "valor": 100.00,
+  "tipo": "despesa",
+  "categoriaId": "{ID_CATEGORIA_RECEITA}",
+  "pessoaId": "{ID_PESSOA_MAIOR}"
+}
+
+###
+
+# 13. Listar Todas as Transações
+GET {{baseUrl}}/transacoes
+Accept: application/json
+
+
+### --- CONSULTAS DE TOTAIS (RELATÓRIOS) ---
+
+# 14. Consulta de Totais por Pessoa
+GET {{baseUrl}}/pessoas/totais
+Accept: application/json
+
+###
+
+# 15. Consulta de Totais por Categoria (Opcional)
+GET {{baseUrl}}/categorias/totais
+Accept: application/json
