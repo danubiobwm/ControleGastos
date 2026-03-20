@@ -13,10 +13,10 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Regra de Negócio: Deletar pessoa apaga transações
         modelBuilder.Entity<Pessoa>()
             .HasMany(p => p.Transacoes)
             .WithOne(t => t.Pessoa)
+            .HasForeignKey(t => t.PessoaId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

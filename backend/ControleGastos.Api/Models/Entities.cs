@@ -1,21 +1,13 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace ControleGastos.Api.Models;
-
-// Enums para garantir integridade dos tipos
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum Finalidade { Despesa, Receita, Ambas }
-
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum TipoTransacao { Despesa, Receita }
 
 public class Pessoa
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     [Required, MaxLength(200)] public string Nome { get; set; } = string.Empty;
     [Required] public int Idade { get; set; }
-    public List<Transacao> Transacoes { get; set; } = new();
+    public ICollection<Transacao> Transacoes { get; set; } = new List<Transacao>();
 }
 
 public class Categoria
