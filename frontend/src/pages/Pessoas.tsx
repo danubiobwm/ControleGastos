@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-
-import { Trash2, Edit, Plus, X } from "lucide-react";
 import api from "../api/api";
+import { Trash2, Edit, Plus, X, UserPlus } from "lucide-react";
 
 interface Pessoa {
   id: string;
@@ -9,21 +8,11 @@ interface Pessoa {
   idade: number;
 }
 
-interface PessoaRequest {
-  nome: string;
-  idade: number;
-}
-
 export function Pessoas() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<PessoaRequest>({
-    nome: "",
-    idade: 0,
-  });
+  const [formData, setFormData] = useState({ nome: "", idade: 0 });
 
   useEffect(() => {
     carregarPessoas();
@@ -36,12 +25,8 @@ export function Pessoas() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    if (editingId) {
-      await api.put(`/pessoas/${editingId}`, formData);
-    } else {
-      await api.post("/pessoas", formData);
-    }
+    if (editingId) await api.put(`/pessoas/${editingId}`, formData);
+    else await api.post("/pessoas", formData);
 
     setFormData({ nome: "", idade: 0 });
     setEditingId(null);
@@ -56,11 +41,7 @@ export function Pessoas() {
   }
 
   async function handleDelete(id: string) {
-    if (
-      confirm(
-        "Tem certeza? Todas as transações desta pessoa serão apagadas do banco.",
-      )
-    ) {
+    if (confirm("Deseja excluir? As transações vinculadas serão apagadas.")) {
       await api.delete(`/pessoas/${id}`);
       carregarPessoas();
     }
@@ -68,51 +49,58 @@ export function Pessoas() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-100">
-          Gerenciamento de Pessoas
-        </h2>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-100">
+            Gerenciamento de Pessoas
+          </h2>
+          <p className="text-slate-400 mt-1">
+            Cadastre os moradores da residência
+          </p>
+        </div>
         <button
           onClick={() => {
             setIsModalOpen(true);
             setEditingId(null);
             setFormData({ nome: "", idade: 0 });
           }}
-          className="bg-brand-purple-btn text-white px-4 py-2 rounded-lg flex items-center hover:bg-opacity-80 transition"
+          className="bg-purple-600 text-white px-5 py-2.5 rounded-xl flex items-center hover:bg-opacity-80 transition shadow-lg shadow-purple-900/20 active:scale-95"
         >
-          <Plus className="w-4 h-4 mr-2" /> Nova Pessoa
+          <UserPlus className="w-4 h-4 mr-2" /> Nova Pessoa
         </button>
       </div>
 
-      <div className="bg-brand-dark-card rounded-lg shadow-xl overflow-hidden">
-        <table className="w-full text-left text-gray-200">
-          <thead className="bg-brand-dark-bg bg-opacity-40 border-b border-gray-700">
+      <div className="bg-[#1e293b] rounded-xl shadow-xl overflow-hidden border border-slate-800">
+        <table className="w-full text-left text-slate-200">
+          <thead className="bg-[#0f172a] border-b border-slate-800">
             <tr>
-              <th className="px-6 py-3 font-semibold text-gray-300">Nome</th>
-              <th className="px-6 py-3 font-semibold text-gray-300">Idade</th>
-              <th className="px-6 py-3 font-semibold text-gray-300 text-right">
+              <th className="px-6 py-4 font-semibold text-slate-300">
+                Nome do Morador
+              </th>
+              <th className="px-6 py-4 font-semibold text-slate-300">Idade</th>
+              <th className="px-6 py-4 font-semibold text-slate-300 text-right">
                 Ações
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-800">
             {pessoas.map((p) => (
               <tr
                 key={p.id}
-                className="border-b border-gray-700 hover:bg-brand-dark-bg hover:bg-opacity-50"
+                className="hover:bg-slate-800/50 transition-colors"
               >
-                <td className="px-6 py-4">{p.nome}</td>
-                <td className="px-6 py-4">{p.idade} anos</td>
-                <td className="px-6 py-4 text-right space-x-3">
+                <td className="px-6 py-5 font-medium">{p.nome}</td>
+                <td className="px-6 py-5 text-slate-300">{p.idade} anos</td>
+                <td className="px-6 py-5 text-right space-x-2">
                   <button
                     onClick={() => handleEdit(p)}
-                    className="text-brand-blue-accent hover:text-blue-300 transition-colors"
+                    className="text-sky-400 hover:text-sky-300 p-2 rounded-lg hover:bg-sky-400/10"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(p.id)}
-                    className="text-red-500 hover:text-red-300 transition-colors"
+                    className="text-red-500 hover:text-red-300 p-2 rounded-lg hover:bg-red-500/10"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -124,30 +112,30 @@ export function Pessoas() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-brand-dark-card rounded-xl p-6 w-full max-w-md shadow-2xl border border-gray-700">
-            <div className="flex justify-between items-center mb-5">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="bg-[#1e293b] rounded-2xl p-8 w-full max-w-md shadow-2xl border border-slate-700 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
               <h3 className="text-xl font-bold text-gray-100">
                 {editingId ? "Editar" : "Nova"} Pessoa
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-slate-400 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Nome
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                  Nome Completo
                 </label>
                 <input
                   type="text"
-                  maxLength={200}
                   required
-                  className="w-full border border-gray-600 bg-brand-dark-bg text-gray-100 rounded-lg p-2.5 focus:ring-1 focus:ring-brand-blue-accent"
+                  maxLength={200}
+                  className="w-full border border-slate-700 bg-[#0f172a] text-gray-100 rounded-xl p-3 focus:ring-1 focus:ring-sky-400 outline-none transition"
                   value={formData.nome}
                   onChange={(e) =>
                     setFormData({ ...formData, nome: e.target.value })
@@ -155,13 +143,13 @@ export function Pessoas() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">
                   Idade
                 </label>
                 <input
                   type="number"
                   required
-                  className="w-full border border-gray-600 bg-brand-dark-bg text-gray-100 rounded-lg p-2.5 focus:ring-1 focus:ring-brand-blue-accent"
+                  className="w-full border border-slate-700 bg-[#0f172a] text-gray-100 rounded-xl p-3 focus:ring-1 focus:ring-sky-400 outline-none transition"
                   value={formData.idade || ""}
                   onChange={(e) =>
                     setFormData({
@@ -173,7 +161,7 @@ export function Pessoas() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-brand-purple-btn text-white py-2.5 rounded-lg hover:bg-opacity-80 transition"
+                className="w-full bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-500 transition font-bold text-lg shadow-lg active:scale-95 mt-4"
               >
                 {editingId ? "Salvar Alterações" : "Cadastrar"}
               </button>
