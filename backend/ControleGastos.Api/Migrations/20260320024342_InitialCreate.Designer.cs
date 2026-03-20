@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ControleGastos.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260320022255_InitialCreate")]
+    [Migration("20260320024342_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -36,8 +36,9 @@ namespace ControleGastos.Api.Migrations
                         .HasMaxLength(400)
                         .HasColumnType("character varying(400)");
 
-                    b.Property<int>("Finalidade")
-                        .HasColumnType("integer");
+                    b.Property<string>("Finalidade")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -80,8 +81,9 @@ namespace ControleGastos.Api.Migrations
                     b.Property<Guid>("PessoaId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Tipo")
-                        .HasColumnType("integer");
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Valor")
                         .HasColumnType("numeric");

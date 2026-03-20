@@ -1,30 +1,57 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ControleGastos.Api.Models;
 
 public class Pessoa
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    [Required, MaxLength(200)] public string Nome { get; set; } = string.Empty;
-    [Required] public int Idade { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
+
+    [Required, MaxLength(200)]
+    public string Nome { get; set; } = string.Empty;
+
+    [Required]
+    public int Idade { get; set; }
+
+    [JsonIgnore]
     public ICollection<Transacao> Transacoes { get; set; } = new List<Transacao>();
 }
 
 public class Categoria
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    [Required, MaxLength(400)] public string Descricao { get; set; } = string.Empty;
-    [Required] public Finalidade Finalidade { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
+
+    [Required, MaxLength(400)]
+    public string Descricao { get; set; } = string.Empty;
+
+    [Required]
+    public string Finalidade { get; set; } = "Ambas";
 }
 
 public class Transacao
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    [Required, MaxLength(400)] public string Descricao { get; set; } = string.Empty;
-    [Required, Range(0.01, double.MaxValue)] public decimal Valor { get; set; }
-    [Required] public TipoTransacao Tipo { get; set; }
-    [Required] public Guid CategoriaId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
+
+    [Required, MaxLength(400)]
+    public string Descricao { get; set; } = string.Empty;
+
+    [Required]
+    public decimal Valor { get; set; }
+
+    [Required]
+    public string Tipo { get; set; } = "Despesa";
+
+    public Guid CategoriaId { get; set; }
     public Categoria? Categoria { get; set; }
-    [Required] public Guid PessoaId { get; set; }
+
+    public Guid PessoaId { get; set; }
+    [JsonIgnore]
     public Pessoa? Pessoa { get; set; }
 }

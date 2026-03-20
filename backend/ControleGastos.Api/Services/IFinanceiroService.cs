@@ -1,11 +1,12 @@
 using ControleGastos.Api.Models;
+using ControleGastos.Api.DTOs;
 
 namespace ControleGastos.Api.Services;
 
 public interface IFinanceiroService
 {
-  Task<IEnumerable<Transacao>> ListarTransacoesAsync();
-  Task<(bool Success, string Message)> SalvarTransacaoAsync(Transacao transacao);
+  Task<(bool Success, string Message, Transacao? Data)> SalvarTransacaoAsync(TransacaoRequest request);
   Task<object> ObterTotaisPorPessoaAsync();
   Task<object> ObterTotaisPorCategoriaAsync();
+  Task<IEnumerable<Transacao>> ListarTransacoesAsync();
 }

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ControleGastos.Api.Models;
+using ControleGastos.Api.DTOs;
 using ControleGastos.Api.Services;
 
 namespace ControleGastos.Api.Controllers;
@@ -10,28 +10,15 @@ public class TransacoesController : ControllerBase
 {
   private readonly IFinanceiroService _service;
 
-  public TransacoesController(IFinanceiroService service)
-  {
-    _service = service;
-  }
+  public TransacoesController(IFinanceiroService service) => _service = service;
 
   [HttpPost]
-  public async Task<IActionResult> Create(Transacao transacao)
+  public async Task<IActionResult> Create(TransacaoRequest request)
   {
-    var (success, message) = await _service.SalvarTransacaoAsync(transacao);
+    var (success, message, data) = await _service.SalvarTransacaoAsync(request);
+
     if (!success) return BadRequest(new { error = message });
-    return Ok(transacao);
+
+    return Ok(data);
   }
-
-  [HttpGet("totais-pessoa")]
-  public async Task<IActionResult> GetTotaisPessoa()
-      => Ok(await _service.ObterTotaisPorPessoaAsync());
-
-  [HttpGet("totais-categoria")]
-  public async Task<IActionResult> GetTotaisCategoria()
-      => Ok(await _service.ObterTotaisPorCategoriaAsync());
-
-  [HttpGet]
-  public async Task<IActionResult> ListarTodas()
-      => Ok(await _service.ListarTransacoesAsync());
 }

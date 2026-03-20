@@ -17,7 +17,7 @@ namespace ControleGastos.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Descricao = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
-                    Finalidade = table.Column<int>(type: "integer", nullable: false)
+                    Finalidade = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,7 +44,7 @@ namespace ControleGastos.Api.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Descricao = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
                     Valor = table.Column<decimal>(type: "numeric", nullable: false),
-                    Tipo = table.Column<int>(type: "integer", nullable: false),
+                    Tipo = table.Column<string>(type: "text", nullable: false),
                     CategoriaId = table.Column<Guid>(type: "uuid", nullable: false),
                     PessoaId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
