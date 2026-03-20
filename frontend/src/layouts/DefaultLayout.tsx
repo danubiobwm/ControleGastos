@@ -4,17 +4,14 @@ import { LayoutDashboard, Users, Tag, ArrowRightLeft } from "lucide-react";
 export function DefaultLayout() {
   return (
     <div className="flex h-screen bg-brand-dark-bg">
-      {/* Sidebar - Fundo um pouco mais claro que o principal */}
       <aside className="w-64 bg-brand-dark-card shadow-lg flex flex-col">
         <div className="p-6 border-b border-gray-700">
-          {/* Logo/Título usando o azul de destaque */}
           <h1 className="text-xl font-bold text-brand-blue-accent flex items-center gap-2">
             <Tag className="w-6 h-6" /> GastoResidencial
           </h1>
         </div>
 
         <nav className="flex-1 mt-6">
-          {/* Links de navegação com hover usando o roxo do print */}
           <SidebarLink to="/" icon={LayoutDashboard} text="Dashboard" />
           <SidebarLink to="/pessoas" icon={Users} text="Pessoas" />
           <SidebarLink to="/categorias" icon={Tag} text="Categorias" />
@@ -26,7 +23,6 @@ export function DefaultLayout() {
         </nav>
       </aside>
 
-      {/* Área de Conteúdo Principal */}
       <main className="flex-1 overflow-y-auto p-8">
         <Outlet />
       </main>
@@ -34,7 +30,6 @@ export function DefaultLayout() {
   );
 }
 
-// Sub-componente para limpar o código dos links da sidebar
 interface SidebarLinkProps {
   to: string;
   icon: React.ElementType;
