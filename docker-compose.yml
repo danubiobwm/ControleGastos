@@ -19,10 +19,10 @@ services:
     depends_on:
       - db
 
-  # frontend:
-  #   build: ./frontend
-  #   container_name: g-frontend-web
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
+  frontend:
+    build: ./frontend
+    container_name: g-frontend-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
