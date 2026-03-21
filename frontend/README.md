@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+#  Sistema de Controle de Gastos Residencial
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é um projeto Full Stack desenvolvido para gerenciar finanças residenciais, permitindo o controle de receitas e despesas por pessoa e categoria. A aplicação é totalmente conteinerizada com Docker para facilitar a configuração e o deploy.
 
-Currently, two official plugins are available:
+##  Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Frontend
+- **React 18** com **Vite**
+- **TypeScript**
+- **Tailwind CSS** (Estilização)
+- **Lucide React** (Ícones)
+- **React Router Dom** (Navegação)
+- **Axios** (Consumo de API)
 
-## React Compiler
+### Backend
+- **.NET API** (C#)
+- **Entity Framework Core**
+- **PostgreSQL** (Banco de Dados)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+##  Como Executar o Projeto com Docker
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Certifique-se de ter o **Docker** e o **Docker Compose** instalados em sua máquina.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/danubiobwm/ControleGastos/
+    cd ControleGastos
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2.  **Suba os containers:**
+    ```bash
+    docker-compose up --build
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+3.  **Acesse as aplicações:**
+    - **Frontend:** [http://localhost:3000](http://localhost:3000)
+    - **Backend (API):** [http://localhost:5000](http://localhost:5000)
+    - **Banco de Dados:** Porta `5432`
+
+---
+
+##  Estrutura do Projeto
+
+```text
+.
+├── backend/            # API em .NET
+├── frontend/           # Aplicação React
+│   ├── src/
+│   │   ├── api/        # Configuração do Axios
+│   │   ├── components/ # Componentes reutilizáveis
+│   │   ├── layouts/    # Estrutura principal (Sidebar/Header)
+│   │   └── pages/      # Dashboard, Pessoas, etc.
+│   └── Dockerfile      # Build de produção com Nginx
+└── docker-compose.yml  # Orquestração dos serviços (DB, API, Web)
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Notas Técnicas Importantes
+Dashboard e API
+O Dashboard consome o endpoint /pessoas/totais. Ele espera um objeto JSON no seguinte formato para funcionar corretamente:
 ```
+{
+  "totalGeralReceitas": 1500,
+  "totalGeralDespesas": 500,
+  "saldoLiquidoGeral": 1000,
+  "detalhesPorPessoa": [
+    { "nome": "João", "totalReceitas": 1500, "totalDespesas": 500, "saldo": 1000 }
+  ]
+}
+```
+### Estilização
+O projeto utiliza Tailwind CSS. Se o layout aparecer desalinhado, verifique se o arquivo tailwind.config.js na pasta frontend está processando os arquivos na pasta src.
+
+### Banco de Dados
+O banco PostgreSQL é inicializado automaticamente. Caso as tabelas não sejam encontradas, verifique se as migrations do Entity Framework foram aplicadas ou se os nomes das tabelas no código batem com o banco (ex: "Pessoas" vs "pessoas").
+
+### Autor
+Desenvolvido por Danubio.

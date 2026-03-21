@@ -1,133 +1,115 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
-import { Tag, Plus, X } from "lucide-react";
-
-interface Categoria {
-  id: string;
-  descricao: string;
-  finalidade: string;
-}
+import { Plus, Trash2, X } from "lucide-react";
 
 export function Categorias() {
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    descricao: "",
-    finalidade: "ambas",
-  });
+  const [cats, setCats] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [form, setForm] = useState({ descricao: "", finalidade: "ambas" });
 
+  const load = () => api.get("/categorias").then((r) => setCats(r.data));
   useEffect(() => {
-    carregarCategorias();
+    load();
   }, []);
 
-  async function carregarCategorias() {
-    const res = await api.get("/categorias");
-    setCategorias(res.data);
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  const save = async (e: any) => {
     e.preventDefault();
-    await api.post("/categorias", formData);
-    setFormData({ descricao: "", finalidade: "ambas" });
-    setIsModalOpen(false);
-    carregarCategorias();
-  }
+    await api.post("/categorias", form);
+    setModal(false);
+    setForm({ descricao: "", finalidade: "ambas" });
+    load();
+  };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-100 text-brand-blue-accent">
-          Categorias
-        </h2>
+    <div className="p-4">
+      <div className="flex justify-between mb-8 items-center">
+        <h2 className="text-2xl font-bold">CATEGORIAS</h2>
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-brand-purple-btn text-white px-4 py-2 rounded-lg flex items-center hover:bg-opacity-80 transition"
+          onClick={() => setModal(true)}
+          className="bg-purple-600 px-4 py-2 rounded-lg font-bold flex gap-2 items-center"
         >
-          <Plus className="w-4 h-4 mr-2" /> Nova Categoria
+          <Plus size={18} /> Nova Categoria
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categorias.map((c) => (
-          <div
-            key={c.id}
-            className="bg-brand-dark-card p-5 rounded-xl border border-gray-700 shadow-lg flex justify-between items-center"
-          >
-            <div>
-              <p className="text-gray-100 font-semibold text-lg">
-                {c.descricao}
-              </p>
-              <span
-                className={`text-xs uppercase px-2 py-1 rounded font-bold ${
-                  c.finalidade === "receita"
-                    ? "bg-green-900 text-green-300"
-                    : c.finalidade === "despesa"
-                      ? "bg-red-900 text-red-300"
-                      : "bg-blue-900 text-blue-300"
-                }`}
-              >
-                {c.finalidade}
-              </span>
-            </div>
-            <Tag className="text-gray-600 w-8 h-8 opacity-20" />
-          </div>
-        ))}
+      <div className="bg-[#1e293b] rounded-xl border border-slate-800">
+        <table className="w-full text-left">
+          <thead className="bg-slate-900/50 text-slate-500 uppercase text-xs">
+            <tr>
+              <th className="p-4">Descrição</th>
+              <th className="p-4">Finalidade</th>
+              <th className="p-4">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            {cats.map((c: any) => (
+              <tr key={c.id} className="hover:bg-slate-800/50">
+                <td className="p-4 text-white font-medium">{c.descricao}</td>
+                <td className="p-4">
+                  <span className="bg-slate-900 px-3 py-1 rounded text-xs uppercase">
+                    {c.finalidade}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <button
+                    onClick={async () => {
+                      await api.delete(`/categorias/${c.id}`);
+                      load();
+                    }}
+                    className="text-red-400"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-brand-dark-card rounded-xl p-6 w-full max-w-md border border-gray-700">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-xl font-bold text-gray-100">
-                Nova Categoria
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X />
-              </button>
+      {modal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <form
+            onSubmit={save}
+            className="bg-[#1e293b] p-8 rounded-2xl border border-slate-700 w-full max-w-md shadow-2xl"
+          >
+            <div className="flex justify-between mb-6 items-center">
+              <h3 className="text-xl font-bold">Nova Categoria</h3>
+              <X onClick={() => setModal(false)} className="cursor-pointer" />
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Descrição
-                </label>
+            <div className="space-y-4">
+              <label className="block">
+                Descrição:
                 <input
-                  type="text"
                   required
-                  maxLength={400}
-                  className="w-full border border-gray-600 bg-brand-dark-bg text-gray-100 rounded-lg p-2.5 focus:ring-1 focus:ring-brand-blue-accent outline-none"
-                  value={formData.descricao}
+                  className="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg mt-1"
+                  value={form.descricao}
                   onChange={(e) =>
-                    setFormData({ ...formData, descricao: e.target.value })
+                    setForm({ ...form, descricao: e.target.value })
                   }
                 />
+              </label>
+              <div className="flex gap-4 p-3 bg-slate-900 rounded-lg justify-around">
+                {["receita", "despesa", "ambas"].map((f) => (
+                  <label
+                    key={f}
+                    className="flex gap-2 items-center text-sm capitalize"
+                  >
+                    <input
+                      type="radio"
+                      name="fin"
+                      checked={form.finalidade === f}
+                      onChange={() => setForm({ ...form, finalidade: f })}
+                    />{" "}
+                    {f}
+                  </label>
+                ))}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Finalidade
-                </label>
-                <select
-                  className="w-full border border-gray-600 bg-brand-dark-bg text-gray-100 rounded-lg p-2.5 outline-none"
-                  value={formData.finalidade}
-                  onChange={(e) =>
-                    setFormData({ ...formData, finalidade: e.target.value })
-                  }
-                >
-                  <option value="receita">Receita</option>
-                  <option value="despesa">Despesa</option>
-                  <option value="ambas">Ambas</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-brand-purple-btn text-white py-2.5 rounded-lg hover:bg-opacity-80 transition font-semibold"
-              >
-                Salvar Categoria
+              <button className="w-full bg-purple-600 p-3 rounded-lg font-bold mt-4">
+                SALVAR CATEGORIA
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       )}
     </div>
