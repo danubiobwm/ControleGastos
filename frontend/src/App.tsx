@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { DefaultLayout } from "./layouts/DefaultLayout";
+import { AppLayout } from "./layouts/AppLayout";
 import { Dashboard } from "./pages/Dashboard";
 import { Pessoas } from "./pages/Pessoas";
 import { Categorias } from "./pages/Categorias";
@@ -9,7 +9,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DefaultLayout />}>
+        <Route path="/" element={<AppLayout title="Sistema Financeiro" />}>
           <Route index element={<Dashboard />} />
           <Route path="pessoas" element={<Pessoas />} />
           <Route path="categorias" element={<Categorias />} />

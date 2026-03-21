@@ -1,33 +1,45 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
+import { AppLayout } from "../layouts/AppLayout";
+import { GlassCard } from "../components/GlassCard";
+import {
+  Grid,
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import {
+  Wallet,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  TrendingUp,
+} from "lucide-react";
 
 export function Dashboard() {
   const [detalhes, setDetalhes] = useState<any[]>([]);
-  const [totaisGerais, setTotaisGerais] = useState({
-    receitas: 0,
-    despesas: 0,
-    saldo: 0,
-  });
+  const [totais, setTotais] = useState({ receitas: 0, despesas: 0, saldo: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function carregarDados() {
       try {
-        console.log("Chamando API...");
         const response = await api.get("/pessoas/totais");
-
         const data = response.data;
-
         if (data) {
           setDetalhes(data.detalhesPorPessoa || []);
-          setTotaisGerais({
+          setTotais({
             receitas: data.totalGeralReceitas || 0,
             despesas: data.totalGeralDespesas || 0,
             saldo: data.saldoLiquidoGeral || 0,
           });
         }
       } catch (err) {
-        console.error("Erro na requisição:", err);
+        console.error("Erro ao carregar dashboard:", err);
       } finally {
         setLoading(false);
       }
@@ -35,75 +47,172 @@ export function Dashboard() {
     carregarDados();
   }, []);
 
+  const formatBRL = (val: number) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val);
+
   if (loading)
     return (
-      <div className="p-10 text-white text-2xl font-bold">CARREGANDO...</div>
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#0b0f1a",
+        }}
+      >
+        <Typography sx={{ color: "#6b7280", fontWeight: 800 }}>
+          CARREGANDO DADOS...
+        </Typography>
+      </Box>
     );
 
   return (
-    <div className="p-6 space-y-8 animate-in fade-in duration-500">
-      <h1 className="text-3xl font-bold text-white uppercase tracking-tighter">
-        Dashboard Financeiro
-      </h1>
+    <AppLayout title="Dashboard Financeiro">
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <GlassCard sx={{ borderLeft: "4px solid #7c3aed" }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+            >
+              <Typography
+                variant="overline"
+                sx={{ color: "#9ca3af", fontWeight: 700 }}
+              >
+                Saldo Geral
+              </Typography>
+              <Wallet size={20} color="#7c3aed" />
+            </Box>
+            <Typography variant="h4" sx={{ fontWeight: 900 }}>
+              {formatBRL(totais.saldo)}
+            </Typography>
+          </GlassCard>
+        </Grid>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#1e293b] p-6 rounded-xl border-l-8 border-sky-500 shadow-2xl">
-          <p className="text-slate-400 text-xs font-black uppercase mb-2">
-            Saldo Geral
-          </p>
-          <h2 className="text-3xl font-bold text-white">
-            R$ {totaisGerais.saldo.toFixed(2)}
-          </h2>
-        </div>
-        <div className="bg-[#1e293b] p-6 rounded-xl border-l-8 border-green-500 shadow-2xl">
-          <p className="text-slate-400 text-xs font-black uppercase mb-2">
-            Total Receitas
-          </p>
-          <h2 className="text-3xl font-bold text-green-400">
-            R$ {totaisGerais.receitas.toFixed(2)}
-          </h2>
-        </div>
-        <div className="bg-[#1e293b] p-6 rounded-xl border-l-8 border-red-500 shadow-2xl">
-          <p className="text-slate-400 text-xs font-black uppercase mb-2">
-            Total Despesas
-          </p>
-          <h2 className="text-3xl font-bold text-red-400">
-            R$ {totaisGerais.despesas.toFixed(2)}
-          </h2>
-        </div>
-      </div>
+        {/* CARD RECEITAS */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <GlassCard sx={{ borderLeft: "4px solid #10b981" }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+            >
+              <Typography
+                variant="overline"
+                sx={{ color: "#9ca3af", fontWeight: 700 }}
+              >
+                Receitas
+              </Typography>
+              <ArrowUpCircle size={20} color="#10b981" />
+            </Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, color: "#4ade80" }}>
+              {formatBRL(totais.receitas)}
+            </Typography>
+          </GlassCard>
+        </Grid>
 
-      <div className="bg-[#1e293b] rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-        <div className="p-4 bg-slate-900 border-b border-slate-800 font-bold text-white uppercase text-xs tracking-widest">
-          Resumo por Pessoa
-        </div>
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-900/50 text-slate-400 uppercase text-[10px]">
-            <tr>
-              <th className="p-4">Nome</th>
-              <th className="p-4">Receitas</th>
-              <th className="p-4">Despesas</th>
-              <th className="p-4">Saldo</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800">
-            {detalhes.map((p: any, i) => (
-              <tr key={i} className="hover:bg-slate-800/50 transition-colors">
-                <td className="p-4 text-white font-medium">{p.nome}</td>
-                <td className="p-4 text-green-400 font-semibold">
-                  R$ {p.totalReceitas.toFixed(2)}
-                </td>
-                <td className="p-4 text-red-400 font-semibold">
-                  R$ {p.totalDespesas.toFixed(2)}
-                </td>
-                <td className="p-4 text-slate-300 font-bold">
-                  R$ {p.saldo.toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+        {/* CARD DESPESAS */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <GlassCard sx={{ borderLeft: "4px solid #ef4444" }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+            >
+              <Typography
+                variant="overline"
+                sx={{ color: "#9ca3af", fontWeight: 700 }}
+              >
+                Despesas
+              </Typography>
+              <ArrowDownCircle size={20} color="#ef4444" />
+            </Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, color: "#f87171" }}>
+              {formatBRL(totais.despesas)}
+            </Typography>
+          </GlassCard>
+        </Grid>
+
+        {/* TABELA - size={12} ocupa a largura toda */}
+        <Grid size={{ xs: 12 }}>
+          <GlassCard>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
+              <TrendingUp size={20} color="#a78bfa" />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Resumo por Membro
+              </Typography>
+            </Box>
+
+            <TableContainer>
+              <Table sx={{ minWidth: 650 }}>
+                <TableHead>
+                  <TableRow
+                    sx={{
+                      "& th": {
+                        color: "#6b7280",
+                        borderBottom: "1px solid rgba(255,255,255,0.05)",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        fontSize: "0.7rem",
+                      },
+                    }}
+                  >
+                    <TableCell>Membro</TableCell>
+                    <TableCell align="right">Receitas</TableCell>
+                    <TableCell align="right">Despesas</TableCell>
+                    <TableCell align="right">Saldo Líquido</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {detalhes.map((row) => (
+                    <TableRow
+                      key={row.nome}
+                      sx={{
+                        "& td": {
+                          borderBottom: "1px solid rgba(255,255,255,0.05)",
+                          color: "#fff",
+                          py: 2.5,
+                        },
+                      }}
+                    >
+                      <TableCell sx={{ fontWeight: 600 }}>{row.nome}</TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{ color: "#4ade80", fontWeight: 700 }}
+                      >
+                        {formatBRL(row.totalReceitas)}
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{ color: "#f87171", fontWeight: 700 }}
+                      >
+                        {formatBRL(row.totalDespesas)}
+                      </TableCell>
+                      <TableCell align="right">
+                        <Box
+                          sx={{
+                            display: "inline-block",
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 2,
+                            background:
+                              row.saldo >= 0
+                                ? "rgba(34, 197, 94, 0.1)"
+                                : "rgba(239, 68, 68, 0.1)",
+                            color: row.saldo >= 0 ? "#4ade80" : "#f87171",
+                            fontWeight: 800,
+                          }}
+                        >
+                          {formatBRL(row.saldo)}
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </GlassCard>
+        </Grid>
+      </Grid>
+    </AppLayout>
   );
 }
