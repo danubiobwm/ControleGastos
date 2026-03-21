@@ -4,10 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        "brand-dark-bg": "#0f172a",
-        "brand-dark-card": "#1e293b",
-        "brand-purple-btn": "#7e22ce",
-        "brand-blue-accent": "#38bdf8",
+        brand: {
+          dark: "#0f172a",
+          card: "#1e293b",
+          accent: "#38bdf8",
+          purple: "#7e22ce",
+        },
       },
     },
   },
