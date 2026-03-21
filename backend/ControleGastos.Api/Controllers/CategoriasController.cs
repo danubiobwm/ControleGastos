@@ -82,4 +82,62 @@ public class CategoriasController : ControllerBase
 
     return Ok(resposta);
   }
+  [HttpPut("{id}")]
+  public async Task<IActionResult> Put(Guid id, CategoriaRequest request)
+  {
+    var categoria = await _context.Categorias.FindAsync(id);
+
+    if (categoria == null)
+    {
+      return NotFound(new { message = "Categoria não encontrada." });
+    }
+
+    var finalidadeValida = request.Finalidade.ToLower();
+    if (finalidadeValida != "despesa" && finalidadeValida != "receita" && finalidadeValida != "ambas")
+    {
+      return BadRequest(new { message = "Finalidade deve ser: despesa, receita ou ambas." });
+    }
+
+    categoria.Descricao = request.Descricao;
+    categoria.Finalidade = request.Finalidade;
+
+    try
+    {
+      await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+      if (!CategoriaExists(id)) return NotFound();
+      else throw;
+    }
+
+    return NoContent();
+  }
+
+  // 5. Deletar Categoria
+  [HttpDelete("{id}")]
+  public async Task<IActionResult> Delete(Guid id)
+  {
+    var categoria = await _context.Categorias.FindAsync(id);
+    if (categoria == null)
+    {
+      return NotFound(new { message = "Categoria não encontrada." });
+    }
+
+    var temTransacoes = await _context.Transacoes.AnyAsync(t => t.CategoriaId == id);
+    if (temTransacoes)
+    {
+      return BadRequest(new { message = "Não é possível excluir uma categoria que possui transações vinculadas." });
+    }
+
+    _context.Categorias.Remove(categoria);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Categoria excluída com sucesso." });
+  }
+
+  private bool CategoriaExists(Guid id)
+  {
+    return _context.Categorias.Any(e => e.Id == id);
+  }
 }

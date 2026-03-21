@@ -1,8 +1,10 @@
 @baseUrl = http://localhost:5000/api
 
-### --- CADASTRO DE PESSOAS ---
+# ==========================================================
+# --- CADASTRO DE PESSOAS ---
+# ==========================================================
 
-# 1. Criar Pessoa (Maior de Idade)
+### 1. Criar Pessoa (Maior de Idade)
 # @name criarPessoaMaior
 POST {{baseUrl}}/pessoas
 Content-Type: application/json
@@ -12,9 +14,8 @@ Content-Type: application/json
   "idade": 30
 }
 
-###
-
-# 2. Criar Pessoa (Menor de Idade - Para testar regra de transação)
+### 2. Criar Pessoa (Menor de Idade)
+# @name criarPessoaMenor
 POST {{baseUrl}}/pessoas
 Content-Type: application/json
 
@@ -23,17 +24,13 @@ Content-Type: application/json
   "idade": 15
 }
 
-###
-
-# 3. Listar Todas as Pessoas
+### 3. Listar Todas as Pessoas
 GET {{baseUrl}}/pessoas
 Accept: application/json
 
-###
-
-# 4. Editar Pessoa (Funcionalidade solicitada)
-# Substitua o ID pelo retornado no passo 1
-PUT {{baseUrl}}/pessoas/{ID_GERADO}
+### 4. Editar Pessoa
+# Substitua o ID pelo ID real gerado no banco
+PUT {{baseUrl}}/pessoas/ID_AQUI
 Content-Type: application/json
 
 {
@@ -41,15 +38,16 @@ Content-Type: application/json
   "idade": 31
 }
 
-###
-
-# 5. Deletar Pessoa (Apaga também as transações dela)
-DELETE {{baseUrl}}/pessoas/{ID_GERADO}
+### 5. Deletar Pessoa
+DELETE {{baseUrl}}/pessoas/ID_AQUI
 
 
-### --- CADASTRO DE CATEGORIAS ---
+# ==========================================================
+# --- CADASTRO DE CATEGORIAS ---
+# ==========================================================
 
-# 6. Criar Categoria de Receita
+### 6. Criar Categoria (Receita)
+# @name criarCategoriaReceita
 POST {{baseUrl}}/categorias
 Content-Type: application/json
 
@@ -58,9 +56,7 @@ Content-Type: application/json
   "finalidade": "receita"
 }
 
-###
-
-# 7. Criar Categoria de Despesa
+### 7. Criar Categoria (Despesa)
 POST {{baseUrl}}/categorias
 Content-Type: application/json
 
@@ -69,41 +65,40 @@ Content-Type: application/json
   "finalidade": "despesa"
 }
 
-###
-
-# 8. Criar Categoria de Ambas
-POST {{baseUrl}}/categorias
-Content-Type: application/json
-
-{
-  "descricao": "Diversos",
-  "finalidade": "ambas"
-}
-
-###
-
-# 9. Listar Categorias
+### 8. Listar Categorias
 GET {{baseUrl}}/categorias
 Accept: application/json
 
+### 9. Editar Categoria (NOVO)
+PUT {{baseUrl}}/categorias/ID_AQUI
+Content-Type: application/json
 
-### --- CADASTRO DE TRANSAÇÕES (COM REGRAS) ---
+{
+  "descricao": "Salário e Bônus",
+  "finalidade": "receita"
+}
 
-# 10. Criar Transação Válida (Receita para maior de idade)
+### 10. Deletar Categoria (NOVO)
+DELETE {{baseUrl}}/categorias/ID_AQUI
+
+
+# ==========================================================
+# --- CADASTRO DE TRANSAÇÕES (COM REGRAS) ---
+# ==========================================================
+
+### 11. Criar Transação Válida
 POST {{baseUrl}}/transacoes
 Content-Type: application/json
 
 {
-  "descricao": "Pagamento de Consultoria",
-  "valor": 1500.00,
+  "descricao": "Venda de Notebook",
+  "valor": 2500.00,
   "tipo": "receita",
-  "categoriaId": "{ID_CATEGORIA_RECEITA}",
-  "pessoaId": "{ID_PESSOA_MAIOR}"
+  "categoriaId": "ID_DA_CATEGORIA",
+  "pessoaId": "ID_DA_PESSOA"
 }
 
-###
-
-# 11. TESTE DE ERRO: Receita para Menor de Idade (Deve retornar 400)
+### 12. TESTE DE ERRO: Receita para Menor (Deve retornar 400)
 POST {{baseUrl}}/transacoes
 Content-Type: application/json
 
@@ -111,39 +106,23 @@ Content-Type: application/json
   "descricao": "Mesada",
   "valor": 50.00,
   "tipo": "receita",
-  "categoriaId": "{ID_CATEGORIA_RECEITA}",
-  "pessoaId": "{ID_PESSOA_MENOR}"
+  "categoriaId": "ID_DA_CATEGORIA",
+  "pessoaId": "ID_DO_PEDRO_FILHO"
 }
 
-###
-
-# 12. TESTE DE ERRO: Tipo Despesa em Categoria de Receita (Deve retornar 400)
-POST {{baseUrl}}/transacoes
-Content-Type: application/json
-
-{
-  "descricao": "Estorno Indevido",
-  "valor": 100.00,
-  "tipo": "despesa",
-  "categoriaId": "{ID_CATEGORIA_RECEITA}",
-  "pessoaId": "{ID_PESSOA_MAIOR}"
-}
-
-###
-
-# 13. Listar Todas as Transações
+### 13. Listar Todas as Transações
 GET {{baseUrl}}/transacoes
 Accept: application/json
 
 
-### --- CONSULTAS DE TOTAIS (RELATÓRIOS) ---
+# ==========================================================
+# --- CONSULTAS DE TOTAIS (RELATÓRIOS) ---
+# ==========================================================
 
-# 14. Consulta de Totais por Pessoa
+### 14. Consulta de Totais por Pessoa (Dashboard)
 GET {{baseUrl}}/pessoas/totais
 Accept: application/json
 
-###
-
-# 15. Consulta de Totais por Categoria (Opcional)
+### 15. Consulta de Totais por Categoria
 GET {{baseUrl}}/categorias/totais
 Accept: application/json
