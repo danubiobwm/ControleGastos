@@ -14,35 +14,28 @@ import {
   CircularProgress,
   Avatar,
 } from "@mui/material";
-import {
-  Wallet,
-  ArrowUpRight,
-  ArrowDownRight,
-  Users,
-  LayoutDashboard,
-} from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 
 export function Dashboard() {
   const [detalhes, setDetalhes] = useState<any[]>([]);
+  const [detalhesCat, setDetalhesCat] = useState<any[]>([]);
   const [totais, setTotais] = useState({ receitas: 0, despesas: 0, saldo: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function carregarDados() {
       try {
-        // Chamando o endpoint correto e atualizado
         const response = await api.get("/transacoes/dashboard");
         const data = response.data;
-        if (data) {
-          setDetalhes(data.detalhesPorPessoa || []);
-          setTotais({
-            receitas: data.totalGeralReceitas || 0,
-            despesas: data.totalGeralDespesas || 0,
-            saldo: data.saldoLiquidoGeral || 0,
-          });
-        }
+        setDetalhes(data.detalhesPorPessoa || []);
+        setDetalhesCat(data.detalhesPorCategoria || []);
+        setTotais({
+          receitas: data.totalGeralReceitas || 0,
+          despesas: data.totalGeralDespesas || 0,
+          saldo: data.saldoLiquidoGeral || 0,
+        });
       } catch (err) {
-        console.error("Erro ao carregar dashboard:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -58,20 +51,14 @@ export function Dashboard() {
 
   if (loading)
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "50vh",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
         <CircularProgress sx={{ color: "#7c3aed" }} />
       </Box>
     );
 
   return (
     <Box sx={{ p: 4, width: "100%" }}>
+      {/* HEADER IGUAL À IMAGEM */}
       <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
         <LayoutDashboard size={32} color="#a78bfa" />
         <Box>
@@ -84,100 +71,95 @@ export function Dashboard() {
         </Box>
       </Box>
 
+      {/* CARDS GRANDES - ESTILO ORIGINAL DA SUA IMAGEM */}
       <Grid container spacing={3} sx={{ mb: 6 }}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <GlassCard
-            sx={{
-              borderLeft: "6px solid #7c3aed",
-              minHeight: "160px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+          <GlassCard sx={{ p: 3, borderLeft: "4px solid #7c3aed" }}>
+            <Typography
+              variant="overline"
+              sx={{
+                color: "#a78bfa",
+                fontWeight: 900,
+                display: "block",
+                mb: 1,
+              }}
             >
-              <Typography
-                variant="overline"
-                sx={{ color: "#a78bfa", fontWeight: 800 }}
-              >
-                Saldo em Conta
-              </Typography>
-              <Wallet size={24} color="#a78bfa" />
-            </Box>
-            <Typography variant="h3" sx={{ color: "#fff", fontWeight: 900 }}>
+              SALDO EM CONTA
+            </Typography>
+            <Typography
+              sx={{
+                color: "#fff",
+                fontSize: "2.5rem",
+                fontWeight: 900,
+                lineHeight: 1,
+              }}
+            >
               {formatBRL(totais.saldo)}
             </Typography>
           </GlassCard>
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <GlassCard
-            sx={{
-              borderLeft: "6px solid #10b981",
-              minHeight: "160px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+          <GlassCard sx={{ p: 3, borderLeft: "4px solid #10b981" }}>
+            <Typography
+              variant="overline"
+              sx={{
+                color: "#10b981",
+                fontWeight: 900,
+                display: "block",
+                mb: 1,
+              }}
             >
-              <Typography
-                variant="overline"
-                sx={{ color: "#10b981", fontWeight: 800 }}
-              >
-                Entradas
-              </Typography>
-              <ArrowUpRight size={24} color="#10b981" />
-            </Box>
-            <Typography variant="h3" sx={{ color: "#4ade80", fontWeight: 900 }}>
+              ENTRADAS
+            </Typography>
+            <Typography
+              sx={{
+                color: "#4ade80",
+                fontSize: "2.5rem",
+                fontWeight: 900,
+                lineHeight: 1,
+              }}
+            >
               {formatBRL(totais.receitas)}
             </Typography>
           </GlassCard>
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <GlassCard
-            sx={{
-              borderLeft: "6px solid #ef4444",
-              minHeight: "160px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+          <GlassCard sx={{ p: 3, borderLeft: "4px solid #ef4444" }}>
+            <Typography
+              variant="overline"
+              sx={{
+                color: "#ef4444",
+                fontWeight: 900,
+                display: "block",
+                mb: 1,
+              }}
             >
-              <Typography
-                variant="overline"
-                sx={{ color: "#ef4444", fontWeight: 800 }}
-              >
-                Saídas
-              </Typography>
-              <ArrowDownRight size={24} color="#ef4444" />
-            </Box>
-            <Typography variant="h3" sx={{ color: "#f87171", fontWeight: 900 }}>
+              SAÍDAS
+            </Typography>
+            <Typography
+              sx={{
+                color: "#f87171",
+                fontSize: "2.5rem",
+                fontWeight: 900,
+                lineHeight: 1,
+              }}
+            >
               {formatBRL(totais.despesas)}
             </Typography>
           </GlassCard>
         </Grid>
       </Grid>
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-        <Users size={24} color="#fff" />
-        <Typography variant="h5" sx={{ color: "#fff", fontWeight: 800 }}>
-          Fluxo por Pessoa
-        </Typography>
-      </Box>
-
-      <GlassCard sx={{ p: 0, overflow: "hidden" }}>
+      {/* TABELA DE PESSOAS - CONFORME REQUISITOS */}
+      <Typography variant="h6" sx={{ color: "#fff", mb: 2, fontWeight: 800 }}>
+        Fluxo por Pessoa
+      </Typography>
+      <GlassCard sx={{ p: 0, mb: 5 }}>
         <TableContainer>
           <Table>
-            <TableHead sx={{ bgcolor: "rgba(255,255,255,0.02)" }}>
+            <TableHead>
               <TableRow
                 sx={{
                   "& th": {
@@ -190,7 +172,7 @@ export function Dashboard() {
                 <TableCell>MEMBRO</TableCell>
                 <TableCell align="right">ENTRADAS</TableCell>
                 <TableCell align="right">SAÍDAS</TableCell>
-                <TableCell align="right">RESULTADO</TableCell>
+                <TableCell align="right">SALDO</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -199,60 +181,147 @@ export function Dashboard() {
                   key={i}
                   sx={{
                     "& td": {
-                      py: 2,
-                      borderBottom: "1px solid rgba(255,255,255,0.03)",
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
                     },
                   }}
                 >
-                  <TableCell>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <TableCell sx={{ color: "#fff" }}>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                    >
                       <Avatar
                         sx={{
                           bgcolor: "#7c3aed",
-                          width: 32,
-                          height: 32,
-                          fontSize: "0.8rem",
+                          width: 28,
+                          height: 28,
+                          fontSize: "0.7rem",
                         }}
                       >
                         {row.nome?.charAt(0)}
                       </Avatar>
-                      <Typography sx={{ color: "#fff", fontWeight: 600 }}>
-                        {row.nome}
-                      </Typography>
+                      {row.nome}
                     </Box>
                   </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: "#4ade80", fontWeight: 700 }}
-                  >
+                  <TableCell align="right" sx={{ color: "#4ade80" }}>
                     {formatBRL(row.receitas)}
                   </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: "#f87171", fontWeight: 700 }}
-                  >
+                  <TableCell align="right" sx={{ color: "#f87171" }}>
                     {formatBRL(row.despesas)}
                   </TableCell>
-                  <TableCell align="right">
-                    <Box
-                      sx={{
-                        display: "inline-block",
-                        bgcolor:
-                          row.saldo >= 0
-                            ? "rgba(74,222,128,0.1)"
-                            : "rgba(248,113,113,0.1)",
-                        color: row.saldo >= 0 ? "#4ade80" : "#f87171",
-                        px: 2,
-                        py: 0.5,
-                        borderRadius: 1,
-                        fontWeight: 900,
-                      }}
-                    >
-                      {formatBRL(row.saldo)}
-                    </Box>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: row.saldo >= 0 ? "#4ade80" : "#f87171",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {formatBRL(row.saldo)}
                   </TableCell>
                 </TableRow>
               ))}
+              {/* TOTAL GERAL NO FINAL DA LISTA */}
+              <TableRow sx={{ bgcolor: "rgba(124, 58, 237, 0.1)" }}>
+                <TableCell sx={{ color: "#fff", fontWeight: 900 }}>
+                  TOTAL GERAL
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "#4ade80", fontWeight: 900 }}
+                >
+                  {formatBRL(totais.receitas)}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "#f87171", fontWeight: 900 }}
+                >
+                  {formatBRL(totais.despesas)}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "#fff", fontWeight: 900 }}
+                >
+                  {formatBRL(totais.saldo)}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </GlassCard>
+
+      {/* TABELA DE CATEGORIAS - CONFORME REQUISITOS */}
+      <Typography variant="h6" sx={{ color: "#fff", mb: 2, fontWeight: 800 }}>
+        Fluxo por Categoria
+      </Typography>
+      <GlassCard sx={{ p: 0 }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  "& th": {
+                    color: "#9ca3af",
+                    fontWeight: 700,
+                    borderBottom: "1px solid rgba(255,255,255,0.1)",
+                  },
+                }}
+              >
+                <TableCell>CATEGORIA</TableCell>
+                <TableCell align="right">RECEITAS</TableCell>
+                <TableCell align="right">DESPESAS</TableCell>
+                <TableCell align="right">SALDO</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {detalhesCat.map((row, i) => (
+                <TableRow
+                  key={i}
+                  sx={{
+                    "& td": {
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    },
+                  }}
+                >
+                  <TableCell sx={{ color: "#fff" }}>{row.descricao}</TableCell>
+                  <TableCell align="right" sx={{ color: "#4ade80" }}>
+                    {formatBRL(row.receitas)}
+                  </TableCell>
+                  <TableCell align="right" sx={{ color: "#f87171" }}>
+                    {formatBRL(row.despesas)}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      color: row.saldo >= 0 ? "#4ade80" : "#f87171",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {formatBRL(row.saldo)}
+                  </TableCell>
+                </TableRow>
+              ))}
+              <TableRow sx={{ bgcolor: "rgba(255, 255, 255, 0.05)" }}>
+                <TableCell sx={{ color: "#fff", fontWeight: 900 }}>
+                  TOTAL CATEGORIAS
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "#4ade80", fontWeight: 900 }}
+                >
+                  {formatBRL(totais.receitas)}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "#f87171", fontWeight: 900 }}
+                >
+                  {formatBRL(totais.despesas)}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "#fff", fontWeight: 900 }}
+                >
+                  {formatBRL(totais.saldo)}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

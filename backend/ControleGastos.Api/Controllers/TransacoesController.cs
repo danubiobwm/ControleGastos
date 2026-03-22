@@ -73,19 +73,21 @@ public class TransacoesController : ControllerBase
   public async Task<IActionResult> GetDashboard()
   {
     var pessoas = await _context.Pessoas.ToListAsync();
+    var categorias = await _context.Categorias.ToListAsync();
     var transacoes = await _context.Transacoes.ToListAsync();
 
     var detalhesPorPessoa = pessoas.Select(p =>
     {
       var rec = transacoes.Where(t => t.PessoaId == p.Id && t.Tipo.ToLower() == "receita").Sum(t => t.Valor);
       var des = transacoes.Where(t => t.PessoaId == p.Id && t.Tipo.ToLower() == "despesa").Sum(t => t.Valor);
-      return new
-      {
-        Nome = p.Nome,
-        Receitas = rec,
-        Despesas = des,
-        Saldo = rec - des
-      };
+      return new { Nome = p.Nome, Receitas = rec, Despesas = des, Saldo = rec - des };
+    }).ToList();
+
+    var detalhesPorCategoria = categorias.Select(c =>
+    {
+      var rec = transacoes.Where(t => t.CategoriaId == c.Id && t.Tipo.ToLower() == "receita").Sum(t => t.Valor);
+      var des = transacoes.Where(t => t.CategoriaId == c.Id && t.Tipo.ToLower() == "despesa").Sum(t => t.Valor);
+      return new { Descricao = c.Descricao, Receitas = rec, Despesas = des, Saldo = rec - des };
     }).ToList();
 
     var totalGeralReceitas = detalhesPorPessoa.Sum(d => d.Receitas);
@@ -96,7 +98,8 @@ public class TransacoesController : ControllerBase
       totalGeralReceitas,
       totalGeralDespesas,
       saldoLiquidoGeral = totalGeralReceitas - totalGeralDespesas,
-      detalhesPorPessoa
+      detalhesPorPessoa,
+      detalhesPorCategoria
     });
   }
 }
