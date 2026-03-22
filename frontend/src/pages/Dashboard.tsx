@@ -30,7 +30,8 @@ export function Dashboard() {
   useEffect(() => {
     async function carregarDados() {
       try {
-        const response = await api.get("/pessoas/totais");
+        // Chamando o endpoint correto e atualizado
+        const response = await api.get("/transacoes/dashboard");
         const data = response.data;
         if (data) {
           setDetalhes(data.detalhesPorPessoa || []);
@@ -41,7 +42,7 @@ export function Dashboard() {
           });
         }
       } catch (err) {
-        console.error(err);
+        console.error("Erro ao carregar dashboard:", err);
       } finally {
         setLoading(false);
       }
@@ -71,7 +72,6 @@ export function Dashboard() {
 
   return (
     <Box sx={{ p: 4, width: "100%" }}>
-      {/* HEADER */}
       <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
         <LayoutDashboard size={32} color="#a78bfa" />
         <Box>
@@ -167,7 +167,6 @@ export function Dashboard() {
         </Grid>
       </Grid>
 
-      {/* FLUXO POR PESSOA */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
         <Users size={24} color="#fff" />
         <Typography variant="h5" sx={{ color: "#fff", fontWeight: 800 }}>
@@ -179,7 +178,15 @@ export function Dashboard() {
         <TableContainer>
           <Table>
             <TableHead sx={{ bgcolor: "rgba(255,255,255,0.02)" }}>
-              <TableRow sx={{ "& th": { color: "#9ca3af", fontWeight: 700 } }}>
+              <TableRow
+                sx={{
+                  "& th": {
+                    color: "#9ca3af",
+                    fontWeight: 700,
+                    borderBottom: "1px solid rgba(255,255,255,0.1)",
+                  },
+                }}
+              >
                 <TableCell>MEMBRO</TableCell>
                 <TableCell align="right">ENTRADAS</TableCell>
                 <TableCell align="right">SAÍDAS</TableCell>
@@ -218,13 +225,13 @@ export function Dashboard() {
                     align="right"
                     sx={{ color: "#4ade80", fontWeight: 700 }}
                   >
-                    {formatBRL(row.totalReceitas)}
+                    {formatBRL(row.receitas)}
                   </TableCell>
                   <TableCell
                     align="right"
                     sx={{ color: "#f87171", fontWeight: 700 }}
                   >
-                    {formatBRL(row.totalDespesas)}
+                    {formatBRL(row.despesas)}
                   </TableCell>
                   <TableCell align="right">
                     <Box

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "../api/api";
 import { GlassCard } from "../components/GlassCard";
 import {
-  Grid as Grid,
   Typography,
   Box,
   CircularProgress,
@@ -28,7 +27,6 @@ export function Transacoes() {
   const [categorias, setCategorias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Estados para o Modal
   const [open, setOpen] = useState(false);
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState<number | string>("");
@@ -37,20 +35,31 @@ export function Transacoes() {
   const [categoriaId, setCategoriaId] = useState("");
   const [salvando, setSalvando] = useState(false);
 
+  // Estilo padrão para os inputs aparecerem brancos no fundo escuro
+  const inputStyle = {
+    bgcolor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 1,
+    "& .MuiInputBase-input": { color: "#fff" }, // Texto digitado
+    "& .MuiInputLabel-root": { color: "#9ca3af" }, // Label normal
+    "& .MuiInputLabel-root.Mui-focused": { color: "#a78bfa" }, // Label focada
+    "& .MuiFilledInput-underline:before": {
+      borderBottomColor: "rgba(255,255,255,0.1)",
+    },
+    "& .MuiSelect-icon": { color: "#fff" }, // Ícone do dropdown
+  };
+
   async function carregarDados() {
-    setLoading(true);
     try {
-      // Busca tudo em paralelo para ser mais rápido
-      const [resTrans, resPessoas, resCats] = await Promise.all([
+      const [resT, resP, resC] = await Promise.all([
         api.get("/transacoes"),
         api.get("/pessoas"),
         api.get("/categorias"),
       ]);
-      setTransacoes(resTrans.data || []);
-      setPessoas(resPessoas.data || []);
-      setCategorias(resCats.data || []);
+      setTransacoes(resT.data || []);
+      setPessoas(resP.data || []);
+      setCategorias(resC.data || []);
     } catch (err) {
-      console.error("Erro ao carregar dados:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -62,9 +71,8 @@ export function Transacoes() {
 
   const handleSalvar = async () => {
     if (!descricao || !valor || !pessoaId || !categoriaId) {
-      return alert("Preencha todos os campos!");
+      return alert("Por favor, preencha todos os campos.");
     }
-
     setSalvando(true);
     try {
       await api.post("/transacoes", {
@@ -75,40 +83,25 @@ export function Transacoes() {
         categoriaId,
       });
       setOpen(false);
-      resetForm();
-      carregarDados(); // Recarrega a lista
+      setDescricao("");
+      setValor("");
+      carregarDados();
     } catch (err: any) {
-      // Exibe erro de regra de negócio do backend (ex: Menor de idade tentando receita)
-      alert(err.response?.data?.message || "Erro ao salvar transação");
+      alert(err.response?.data?.message || "Erro ao salvar transação.");
     } finally {
       setSalvando(false);
     }
   };
 
-  const resetForm = () => {
-    setDescricao("");
-    setValor("");
-    setTipo("despesa");
-    setPessoaId("");
-    setCategoriaId("");
-  };
-
-  const formatBRL = (val: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(val);
-
   if (loading)
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
-        <CircularProgress sx={{ color: "#7c3aed" }} />
+        <CircularProgress />
       </Box>
     );
 
   return (
     <Box sx={{ p: 4, width: "100%" }}>
-      {/* HEADER */}
       <Box
         sx={{
           mb: 5,
@@ -123,27 +116,20 @@ export function Transacoes() {
           >
             <ArrowLeftRight size={32} color="#a78bfa" />
           </Box>
-          <Box>
-            <Typography variant="h4" sx={{ color: "#fff", fontWeight: 900 }}>
-              Movimentações
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#6b7280" }}>
-              Histórico financeiro
-            </Typography>
-          </Box>
+          <Typography variant="h4" sx={{ color: "#fff", fontWeight: 900 }}>
+            Movimentações
+          </Typography>
         </Box>
-
         <Button
           variant="contained"
           onClick={() => setOpen(true)}
-          startIcon={<Plus size={20} />}
-          sx={{ bgcolor: "#7c3aed", fontWeight: 700, borderRadius: 2, px: 3 }}
+          startIcon={<Plus />}
+          sx={{ bgcolor: "#7c3aed" }}
         >
           Nova Transação
         </Button>
       </Box>
 
-      {/* LISTAGEM */}
       <Stack spacing={2}>
         {transacoes.map((t) => (
           <GlassCard
@@ -156,10 +142,10 @@ export function Transacoes() {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-              {t.tipo.toLowerCase() === "receita" ? (
-                <ArrowUpCircle size={32} color="#10b981" />
+              {t.tipo === "receita" ? (
+                <ArrowUpCircle color="#10b981" />
               ) : (
-                <ArrowDownCircle size={32} color="#ef4444" />
+                <ArrowDownCircle color="#ef4444" />
               )}
               <Box>
                 <Typography sx={{ color: "#fff", fontWeight: 700 }}>
@@ -167,12 +153,13 @@ export function Transacoes() {
                 </Typography>
                 <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
                   <Chip
-                    label={t.categoriaDescricao}
+                    label={t.categoria?.descricao}
                     size="small"
-                    sx={{ bgcolor: "rgba(255,255,255,0.05)", color: "#9ca3af" }}
+                    sx={{ color: "#9ca3af", borderColor: "#374151" }}
+                    variant="outlined"
                   />
                   <Chip
-                    label={t.pessoaNome}
+                    label={t.pessoa?.nome}
                     size="small"
                     sx={{
                       bgcolor: "rgba(124, 58, 237, 0.1)",
@@ -184,20 +171,19 @@ export function Transacoes() {
             </Box>
             <Typography
               sx={{
-                color:
-                  t.tipo.toLowerCase() === "receita" ? "#10b981" : "#ef4444",
+                color: t.tipo === "receita" ? "#10b981" : "#ef4444",
                 fontWeight: 900,
                 fontSize: "1.2rem",
               }}
             >
-              {t.tipo.toLowerCase() === "receita" ? "+ " : "- "}{" "}
-              {formatBRL(t.valor)}
+              {t.tipo === "receita" ? "+ " : "- "} R${" "}
+              {t.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </Typography>
           </GlassCard>
         ))}
       </Stack>
 
-      {/* MODAL DE CADASTRO */}
+      {/* MODAL CORRIGIDO */}
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -208,47 +194,38 @@ export function Transacoes() {
             p: 4,
             width: "100%",
             maxWidth: 450,
-            bgcolor: "#121214",
+            bgcolor: "#1a1a1e",
             borderRadius: 3,
             border: "1px solid rgba(255,255,255,0.1)",
+            boxShadow: 24,
           }}
         >
           <Typography
             variant="h5"
-            sx={{ color: "#fff", fontWeight: 800, mb: 3 }}
+            sx={{ color: "#fff", mb: 3, fontWeight: 700 }}
           >
             Nova Transação
           </Typography>
 
-          <Stack spacing={2.5}>
+          <Stack spacing={2}>
             <TextField
               fullWidth
               label="Descrição"
               variant="filled"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
-              sx={{
-                bgcolor: "rgba(255,255,255,0.05)",
-                borderRadius: 1,
-                input: { color: "#fff" },
-                label: { color: "#6b7280" },
-              }}
+              sx={inputStyle}
             />
 
             <Stack direction="row" spacing={2}>
               <TextField
                 fullWidth
-                label="Valor (R$)"
+                label="Valor"
                 type="number"
                 variant="filled"
                 value={valor}
                 onChange={(e) => setValor(e.target.value)}
-                sx={{
-                  bgcolor: "rgba(255,255,255,0.05)",
-                  borderRadius: 1,
-                  input: { color: "#fff" },
-                  label: { color: "#6b7280" },
-                }}
+                sx={inputStyle}
               />
               <TextField
                 select
@@ -257,19 +234,13 @@ export function Transacoes() {
                 variant="filled"
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value)}
-                sx={{
-                  bgcolor: "rgba(255,255,255,0.05)",
-                  borderRadius: 1,
-                  "& .MuiSelect-select": { color: "#fff" },
-                  label: { color: "#6b7280" },
-                }}
+                sx={inputStyle}
               >
                 <MenuItem value="despesa">Despesa</MenuItem>
                 <MenuItem value="receita">Receita</MenuItem>
               </TextField>
             </Stack>
 
-            {/* SELETOR DE PESSOA */}
             <TextField
               select
               fullWidth
@@ -277,12 +248,7 @@ export function Transacoes() {
               variant="filled"
               value={pessoaId}
               onChange={(e) => setPessoaId(e.target.value)}
-              sx={{
-                bgcolor: "rgba(255,255,255,0.05)",
-                borderRadius: 1,
-                "& .MuiSelect-select": { color: "#fff" },
-                label: { color: "#6b7280" },
-              }}
+              sx={inputStyle}
             >
               {pessoas.map((p) => (
                 <MenuItem key={p.id} value={p.id}>
@@ -291,7 +257,6 @@ export function Transacoes() {
               ))}
             </TextField>
 
-            {/* SELETOR DE CATEGORIA */}
             <TextField
               select
               fullWidth
@@ -299,43 +264,38 @@ export function Transacoes() {
               variant="filled"
               value={categoriaId}
               onChange={(e) => setCategoriaId(e.target.value)}
-              sx={{
-                bgcolor: "rgba(255,255,255,0.05)",
-                borderRadius: 1,
-                "& .MuiSelect-select": { color: "#fff" },
-                label: { color: "#6b7280" },
-              }}
+              sx={inputStyle}
             >
-              {categorias.map((c) => (
-                <MenuItem key={c.id} value={c.id}>
-                  {c.descricao}
-                </MenuItem>
-              ))}
+              {categorias
+                .filter(
+                  (c) => c.finalidade === "ambas" || c.finalidade === tipo,
+                )
+                .map((c) => (
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.descricao}
+                  </MenuItem>
+                ))}
             </TextField>
-          </Stack>
 
-          <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => setOpen(false)}
-              sx={{ color: "#9ca3af", borderColor: "#374151" }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleSalvar}
-              disabled={salvando}
-              startIcon={
-                salvando ? <CircularProgress size={20} /> : <Save size={20} />
-              }
-              sx={{ bgcolor: "#7c3aed", "&:hover": { bgcolor: "#6d28d9" } }}
-            >
-              Salvar
-            </Button>
-          </Box>
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <Button
+                fullWidth
+                onClick={() => setOpen(false)}
+                sx={{ color: "#9ca3af" }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleSalvar}
+                disabled={salvando}
+                sx={{ bgcolor: "#7c3aed", "&:hover": { bgcolor: "#6d28d9" } }}
+              >
+                {salvando ? "Processando..." : "Salvar"}
+              </Button>
+            </Box>
+          </Stack>
         </Paper>
       </Modal>
     </Box>

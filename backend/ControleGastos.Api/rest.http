@@ -20,8 +20,8 @@ POST {{baseUrl}}/pessoas
 Content-Type: application/json
 
 {
-  "nome": "Pedro Filho",
-  "idade": 15
+  "nome": "Joaquim Filho",
+  "idade": 14
 }
 
 ### 3. Listar Todas as Pessoas

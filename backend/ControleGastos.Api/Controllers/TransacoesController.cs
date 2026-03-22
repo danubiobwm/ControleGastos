@@ -20,6 +20,7 @@ public class TransacoesController : ControllerBase
     return await _context.Transacoes
         .Include(t => t.Categoria)
         .Include(t => t.Pessoa)
+        .OrderByDescending(t => t.Id)
         .ToListAsync();
   }
 
@@ -29,29 +30,32 @@ public class TransacoesController : ControllerBase
     var pessoa = await _context.Pessoas.FindAsync(request.PessoaId);
     var categoria = await _context.Categorias.FindAsync(request.CategoriaId);
 
-    if (pessoa == null) return BadRequest("Pessoa não encontrada.");
-    if (categoria == null) return BadRequest("Categoria não encontrada.");
+    if (pessoa == null) return BadRequest(new { message = "Pessoa não encontrada." });
+    if (categoria == null) return BadRequest(new { message = "Categoria não encontrada." });
 
-    if (request.Valor <= 0) return BadRequest("O valor deve ser um número positivo.");
+    if (!string.IsNullOrEmpty(request.Descricao) && request.Descricao.Length > 400)
+      return BadRequest(new { message = "A descrição não pode exceder 400 caracteres." });
+
+    if (request.Valor <= 0)
+      return BadRequest(new { message = "O valor da transação deve ser um número positivo." });
 
     if (pessoa.Idade < 18 && request.Tipo.ToLower() == "receita")
     {
-      return BadRequest("Menores de 18 anos só podem cadastrar despesas.");
+      return BadRequest(new { message = "Menores de 18 anos só podem cadastrar despesas." });
     }
 
+    var tipoTransacao = request.Tipo.ToLower();
+    var finalidadeCat = categoria.Finalidade.ToLower();
 
-    if (request.Tipo.ToLower() == "despesa" && categoria.Finalidade.ToLower() == "receita")
-    {
-      return BadRequest("Não é permitido usar uma categoria de Receita para uma Despesa.");
-    }
+    if (tipoTransacao == "despesa" && finalidadeCat == "receita")
+      return BadRequest(new { message = $"A categoria '{categoria.Descricao}' é exclusiva para receitas." });
 
-    if (request.Tipo.ToLower() == "receita" && categoria.Finalidade.ToLower() == "despesa")
-    {
-      return BadRequest("Não é permitido usar uma categoria de Despesa para uma Receita.");
-    }
+    if (tipoTransacao == "receita" && finalidadeCat == "despesa")
+      return BadRequest(new { message = $"A categoria '{categoria.Descricao}' é exclusiva para despesas." });
 
     var transacao = new Transacao
     {
+      Id = Guid.NewGuid(),
       Descricao = request.Descricao,
       Valor = request.Valor,
       Tipo = request.Tipo,
@@ -63,5 +67,36 @@ public class TransacoesController : ControllerBase
     await _context.SaveChangesAsync();
 
     return CreatedAtAction(nameof(Get), new { id = transacao.Id }, transacao);
+  }
+
+  [HttpGet("dashboard")]
+  public async Task<IActionResult> GetDashboard()
+  {
+    var pessoas = await _context.Pessoas.ToListAsync();
+    var transacoes = await _context.Transacoes.ToListAsync();
+
+    var detalhesPorPessoa = pessoas.Select(p =>
+    {
+      var rec = transacoes.Where(t => t.PessoaId == p.Id && t.Tipo.ToLower() == "receita").Sum(t => t.Valor);
+      var des = transacoes.Where(t => t.PessoaId == p.Id && t.Tipo.ToLower() == "despesa").Sum(t => t.Valor);
+      return new
+      {
+        Nome = p.Nome,
+        Receitas = rec,
+        Despesas = des,
+        Saldo = rec - des
+      };
+    }).ToList();
+
+    var totalGeralReceitas = detalhesPorPessoa.Sum(d => d.Receitas);
+    var totalGeralDespesas = detalhesPorPessoa.Sum(d => d.Despesas);
+
+    return Ok(new
+    {
+      totalGeralReceitas,
+      totalGeralDespesas,
+      saldoLiquidoGeral = totalGeralReceitas - totalGeralDespesas,
+      detalhesPorPessoa
+    });
   }
 }
