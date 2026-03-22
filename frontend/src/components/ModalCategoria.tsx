@@ -79,7 +79,6 @@ export function ModalCategoria({
             value={tipo}
             onChange={(e) => setTipo(e.target.value)}
           >
-            {/* Valores batendo exatamente com seus testes de endpoint */}
             <MenuItem value="receita">Receita</MenuItem>
             <MenuItem value="despesa">Despesa</MenuItem>
             <MenuItem value="ambas">Ambas (Receita/Despesa)</MenuItem>

@@ -7,11 +7,11 @@ import {
   ArrowRightLeft,
   Plus,
 } from "lucide-react";
-import { useNavigate, useLocation, Outlet } from "react-router-dom"; // 1. Adicionado Outlet
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
 interface AppLayoutProps {
   title: string;
-  children?: React.ReactNode; // 2. O "?" torna o children opcional para o App.tsx não reclamar
+  children?: React.ReactNode;
   actionLabel?: string;
   onAction?: () => void;
 }

@@ -95,7 +95,6 @@ export function Categorias() {
 
   return (
     <Box sx={{ p: 4, width: "100%" }}>
-      {/* HEADER SEM MENU DUPLICADO */}
       <Box
         sx={{
           mb: 5,
@@ -130,7 +129,6 @@ export function Categorias() {
         </Button>
       </Box>
 
-      {/* GRID DE CATEGORIAS */}
       <Grid container spacing={3}>
         {categorias.map((cat) => (
           <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={cat.id}>
@@ -187,7 +185,6 @@ export function Categorias() {
         ))}
       </Grid>
 
-      {/* MODAL DE CATEGORIA */}
       <Modal
         open={open}
         onClose={() => setOpen(false)}

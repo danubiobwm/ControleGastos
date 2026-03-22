@@ -101,7 +101,6 @@ export function Pessoas() {
 
   return (
     <Box sx={{ p: 4, width: "100%" }}>
-      {/* HEADER */}
       <Box
         sx={{
           mb: 5,
@@ -136,7 +135,6 @@ export function Pessoas() {
         </Button>
       </Box>
 
-      {/* GRID DE CARDS */}
       <Grid container spacing={3}>
         {pessoas.map((pessoa) => (
           <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={pessoa.id}>
@@ -148,7 +146,6 @@ export function Pessoas() {
                 borderBottom: "4px solid #7c3aed",
               }}
             >
-              {/* BOTÕES DE AÇÃO NO CARD */}
               <Box
                 sx={{
                   position: "absolute",
@@ -207,7 +204,6 @@ export function Pessoas() {
         ))}
       </Grid>
 
-      {/* MODAL AJUSTADO (NOME + IDADE) */}
       <Modal
         open={open}
         onClose={() => setOpen(false)}

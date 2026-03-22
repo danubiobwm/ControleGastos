@@ -8,7 +8,7 @@ Backend: API .NET 8 (C#) + Entity Framework Core (Porta 5000)
 
 Database: PostgreSQL 15 (Porta 5432)
 
-🛠️ Como Subir o Projeto (Quick Start)
+Como Subir o Projeto (Quick Start)
 Para rodar a aplicação completa, você não precisa instalar o .NET ou o Node.js na sua máquina física, apenas o Docker Desktop.
 
 1. Clonar o Repositório

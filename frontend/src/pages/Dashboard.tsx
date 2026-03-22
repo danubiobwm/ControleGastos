@@ -58,7 +58,6 @@ export function Dashboard() {
 
   return (
     <Box sx={{ p: 4, width: "100%" }}>
-      {/* HEADER IGUAL À IMAGEM */}
       <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
         <LayoutDashboard size={32} color="#a78bfa" />
         <Box>
@@ -71,7 +70,6 @@ export function Dashboard() {
         </Box>
       </Box>
 
-      {/* CARDS GRANDES - ESTILO ORIGINAL DA SUA IMAGEM */}
       <Grid container spacing={3} sx={{ mb: 6 }}>
         <Grid size={{ xs: 12, md: 4 }}>
           <GlassCard sx={{ p: 3, borderLeft: "4px solid #7c3aed" }}>
@@ -152,7 +150,6 @@ export function Dashboard() {
         </Grid>
       </Grid>
 
-      {/* TABELA DE PESSOAS - CONFORME REQUISITOS */}
       <Typography variant="h6" sx={{ color: "#fff", mb: 2, fontWeight: 800 }}>
         Fluxo por Pessoa
       </Typography>
@@ -219,7 +216,6 @@ export function Dashboard() {
                   </TableCell>
                 </TableRow>
               ))}
-              {/* TOTAL GERAL NO FINAL DA LISTA */}
               <TableRow sx={{ bgcolor: "rgba(124, 58, 237, 0.1)" }}>
                 <TableCell sx={{ color: "#fff", fontWeight: 900 }}>
                   TOTAL GERAL
@@ -248,7 +244,6 @@ export function Dashboard() {
         </TableContainer>
       </GlassCard>
 
-      {/* TABELA DE CATEGORIAS - CONFORME REQUISITOS */}
       <Typography variant="h6" sx={{ color: "#fff", mb: 2, fontWeight: 800 }}>
         Fluxo por Categoria
       </Typography>
