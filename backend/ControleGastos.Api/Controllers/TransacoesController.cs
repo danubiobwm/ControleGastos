@@ -15,13 +15,36 @@ public class TransacoesController : ControllerBase
   public TransacoesController(AppDbContext context) => _context = context;
 
   [HttpGet]
-  public async Task<ActionResult<IEnumerable<Transacao>>> Get()
+  public async Task<ActionResult<IEnumerable<object>>> Get()
   {
-    return await _context.Transacoes
+    var transacoes = await _context.Transacoes
         .Include(t => t.Categoria)
         .Include(t => t.Pessoa)
-        .OrderByDescending(t => t.Id)
+        .OrderBy(t => t.Id)
         .ToListAsync();
+
+    decimal saldoAcumulado = 0;
+
+    var resultado = transacoes.Select(t =>
+    {
+      decimal saldoAnterior = saldoAcumulado;
+      if (t.Tipo.ToLower() == "receita") saldoAcumulado += t.Valor;
+      else saldoAcumulado -= t.Valor;
+
+      return new
+      {
+        t.Id,
+        t.Descricao,
+        t.Valor,
+        t.Tipo,
+        PessoaNome = t.Pessoa.Nome,
+        CategoriaNome = t.Categoria.Descricao,
+        SaldoAnterior = saldoAnterior,
+        SaldoAtual = saldoAcumulado
+      };
+    }).Reverse().ToList();
+
+    return Ok(resultado);
   }
 
   [HttpPost]
@@ -37,21 +60,16 @@ public class TransacoesController : ControllerBase
       return BadRequest(new { message = "A descrição não pode exceder 400 caracteres." });
 
     if (request.Valor <= 0)
-      return BadRequest(new { message = "O valor da transação deve ser um número positivo." });
+      return BadRequest(new { message = "O valor deve ser positivo." });
 
     if (pessoa.Idade < 18 && request.Tipo.ToLower() == "receita")
-    {
       return BadRequest(new { message = "Menores de 18 anos só podem cadastrar despesas." });
-    }
 
-    var tipoTransacao = request.Tipo.ToLower();
-    var finalidadeCat = categoria.Finalidade.ToLower();
+    if (request.Tipo.ToLower() == "despesa" && categoria.Finalidade.ToLower() == "receita")
+      return BadRequest(new { message = "Categoria exclusiva para receitas." });
 
-    if (tipoTransacao == "despesa" && finalidadeCat == "receita")
-      return BadRequest(new { message = $"A categoria '{categoria.Descricao}' é exclusiva para receitas." });
-
-    if (tipoTransacao == "receita" && finalidadeCat == "despesa")
-      return BadRequest(new { message = $"A categoria '{categoria.Descricao}' é exclusiva para despesas." });
+    if (request.Tipo.ToLower() == "receita" && categoria.Finalidade.ToLower() == "despesa")
+      return BadRequest(new { message = "Categoria exclusiva para despesas." });
 
     var transacao = new Transacao
     {
@@ -65,7 +83,6 @@ public class TransacoesController : ControllerBase
 
     _context.Transacoes.Add(transacao);
     await _context.SaveChangesAsync();
-
     return CreatedAtAction(nameof(Get), new { id = transacao.Id }, transacao);
   }
 
