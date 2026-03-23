@@ -4,7 +4,7 @@ Este projeto é uma solução completa para gestão de finanças pessoais, permi
 ## Arquitetura do Projeto
 Frontend: React 18 + Vite + TypeScript + Tailwind CSS (Porta 3000)
 
-Backend: API .NET 8 (C#) + Entity Framework Core (Porta 5000)
+Backend: API .NET 9 (C#) + Entity Framework Core (Porta 5000)
 
 Database: PostgreSQL 15 (Porta 5432)
 
